@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AZ-900 Smart Quiz Builder (Unofficial)</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#1b1f2a;--muted:#5d6577;--accent:#2563eb;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--line:#dfe3ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131a;--card:#1a1f2b;--text:#e8ebf2;--muted:#9aa3b5;--accent:#6ea0ff;--ok:#6ee7a0;--okbg:#12361f;--bad:#fca5a5;--badbg:#3b1717;--line:#2a3142;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10131a;--card:#1a1f2b;--text:#e8ebf2;--muted:#9aa3b5;--accent:#6ea0ff;--ok:#6ee7a0;--okbg:#12361f;--bad:#fca5a5;--badbg:#3b1717;--line:#2a3142;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0}.tag{display:inline-block;font-size:.75rem;background:var(--badbg);color:var(--bad);padding:2px 8px;border-radius:99px;margin-top:6px}
+.sub{color:var(--muted);margin:6px 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;cursor:pointer}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);padding:6px 12px;border-radius:99px}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;margin-bottom:8px}
+.q{font-size:1.1rem;font-weight:600;margin:12px 0}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}.opt.no{background:var(--badbg);border-color:var(--bad)}
+.exp{border-left:4px solid var(--accent);padding:8px 12px;margin-top:12px;background:var(--bg);border-radius:6px}
+.primary{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:10px;margin-top:12px}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0}.row span:first-child{width:150px;font-size:.9rem}.row .bar{flex:1}.row span:last-child{width:44px;text-align:right;font-size:.85rem}
+.big{font-size:2rem;font-weight:700}
+.aibox{margin-top:12px}#aiout,#bout{white-space:pre-wrap;margin-top:8px;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px dashed var(--accent)}#aiout:empty,#bout:empty{display:none}select,input{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}input{width:100%;margin:8px 0}
+footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<main>
+<h1>☁️ AZ-900 Smart Quiz Builder</h1>
+<span class="tag">Unofficial study tool · original practice questions</span>
+<p class="sub">Pick a topic, answer, and get an instant explanation. Your readiness updates as you practise.</p>
+<div class="card"><div class="chips" id="chips"></div><p class="sub" style="margin-bottom:0">AI explanations in: <select id="lang" onchange="lang=this.value"><option>English</option><option>Swahili</option></select></p></div>
+<div class="card" id="tools" style="display:none"><b>🤖 AI Study Buddy</b><input id="bq" placeholder="Ask any AZ-900 concept, e.g. What is a region?"><button class="chip" onclick="buddy()">Explain it simply</button><div id="bout"></div></div>
+<div id="app"></div>
+<div class="card" id="ready"></div>
+<footer>Not affiliated with or endorsed by Microsoft. Questions written from scratch for learning. Built for the Power Learn Project Africa hackathon.</footer>
+</main>
+<script>
+const T=["Cloud Concepts","Core Services","Security & Governance","Cost & SLA"];
+const Q=[
+[0,"A startup wants to avoid buying servers upfront and instead pay only for what it uses each month. Which spending model does this describe?",["Capital expenditure (CapEx)","Operational expenditure (OpEx)","Fixed asset depreciation","Prepaid hardware leasing"],1,"Pay-as-you-go cloud spending is OpEx: ongoing costs instead of a large upfront purchase (CapEx)."],
+[0,"In which service model do you still manage the operating system and installed software?",["SaaS","PaaS","IaaS","Serverless"],2,"With IaaS the provider supplies the hardware and virtualisation; you manage the OS, runtime and apps. PaaS and SaaS hand more of that to the provider."],
+[0,"Whatever the service model, which item always stays the customer’s responsibility?",["Physical datacenter security","Host hardware","Their own data and who can access it","Network cables"],2,"Under the shared responsibility model the provider owns physical infrastructure, but you always own your data, identities and access."],
+[0,"A company keeps a sensitive database in its own datacenter but runs its public website in Azure. What is this setup called?",["Public cloud","Private cloud","Hybrid cloud","Multi-region cloud"],2,"Mixing on-premises resources with public cloud resources is a hybrid cloud."],
+[1,"Which Azure service lets you run small pieces of code in response to events without managing servers?",["Azure Functions","Virtual Machines","Azure Bastion","Azure Backup"],0,"Azure Functions is serverless compute: code runs when triggered (a timer, an HTTP call, a new file) and you pay per execution."],
+[1,"You need to store thousands of product photos and videos cheaply. Which storage option fits best?",["Azure Table storage","Blob storage","Queue storage","Managed disk only"],1,"Blob storage is designed for large amounts of unstructured data such as images, video and backups."],
+[1,"What is a resource group in Azure?",["A physical datacenter","A logical container for related resources","A type of virtual network","A billing invoice"],1,"Resource groups hold related resources so you can manage, secure and delete them together."],
+[1,"Which feature protects an app from the failure of a single datacenter inside one region?",["Availability zones","Resource tags","Azure Advisor","Management groups"],0,"Availability zones are separate physical locations within a region, each with independent power, cooling and networking."],
+[2,"Which service manages sign-ins and identities for users and apps in Azure?",["Microsoft Entra ID","Azure Monitor","Azure Blueprints","Azure DNS"],0,"Microsoft Entra ID (formerly Azure Active Directory) is the cloud identity and access management service."],
+[2,"A login requires a password and then an approval on the user’s phone. What is this?",["Single sign-on","Multi-factor authentication","Conditional pricing","Role assignment"],1,"Using two or more proofs of identity (something you know plus something you have) is multi-factor authentication."],
+[2,"Your team must ensure resources can only be created in two approved regions. What should you use?",["Azure Policy","Azure Monitor","Azure Cost Management","Resource locks"],0,"Azure Policy evaluates resources against rules and can deny or flag those that break them, such as using a disallowed region."],
+[2,"How can you stop a production resource from being deleted by accident?",["Add a tag","Apply a resource lock","Move it to another region","Enable autoscale"],1,"A CanNotDelete lock blocks deletion even for users who otherwise have permission."],
+[3,"Before deploying, you want to estimate the monthly cost of a planned solution. Which tool helps?",["Pricing calculator","Service Health","Azure Policy","Cloud Shell"],0,"The pricing calculator estimates cost from the services and sizes you choose; it works before anything is deployed."],
+[3,"Which tool helps you track and analyse what you are actually spending on Azure?",["Microsoft Cost Management","Azure Advisor only","Network Watcher","Azure Migrate"],0,"Cost Management shows actual spend, budgets and alerts. The pricing calculator is for estimates."],
+[3,"What does a Service Level Agreement (SLA) describe?",["Employee roles","The committed uptime and connectivity for a service","The price of a reservation","How to tag resources"],1,"An SLA states the performance target, such as 99.9% uptime, and what remedy applies if it is missed."],
+[3,"You will run a VM steadily for three years and want a lower price. What option fits?",["Pay-as-you-go","Azure Reservations","Spot-only billing","Free account credit"],1,"Reservations trade a one- or three-year commitment for a discount versus pay-as-you-go."]
+];
+const $=id=>document.getElementById(id);
+let topic=-1,list=[],i=0,sc=0,done=false;
+let stats={};try{stats=JSON.parse(localStorage.getItem("az900")||"{}")}catch(e){}
+function save(){try{localStorage.setItem("az900",JSON.stringify(stats))}catch(e){}}
+function chips(){$("chips").innerHTML=["All topics",...T].map((t,k)=>`<button class="chip ${topic===k-1?"on":""}" onclick="start(${k-1})">${t}</button>`).join("")}
+function start(t){topic=t;list=Q.filter(q=>t<0||q[0]===t).sort(()=>Math.random()-.5);i=0;sc=0;done=false;chips();show()}
+function show(){
+ if(i>=list.length){$("app").innerHTML=`<div class="card"><div class="big">${sc}/${list.length}</div><p>Round complete. ${sc/list.length>=.8?"Great work!":"Review the explanations and try again."}</p><button class="primary" onclick="start(${topic})">Practise again</button></div>`;ready();return}
+ const q=list[i];done=false;
+ $("app").innerHTML=`<div class="card"><div class="meta"><span>${T[q[0]]}</span><span>Question ${i+1} of ${list.length}</span></div><div class="bar"><i style="width:${i/list.length*100}%"></i></div><div class="q">${q[1]}</div>${q[2].map((o,k)=>`<button class="opt" onclick="pick(${k})">${o}</button>`).join("")}<div id="fb"></div></div>`;ready()}
+function pick(k){
+ if(done)return;done=true;const q=list[i],ok=k===q[3];if(ok)sc++;
+ const s=stats[q[0]]||{c:0,t:0};s.t++;if(ok)s.c++;stats[q[0]]=s;save();
+ document.querySelectorAll(".opt").forEach((b,n)=>{b.disabled=true;if(n===q[3])b.classList.add("ok");else if(n===k)b.classList.add("no")});
+ $("fb").innerHTML=`<div class="exp"><b>${ok?"Correct!":"Not quite."}</b> ${q[4]}</div>${AI?`<div class="aibox"><button class="chip" onclick="explain()">💡 Explain it simply (African example)</button><div id="aiout"></div></div>`:""}<button class="primary" onclick="i++;show()">${i+1<list.length?"Next question":"See results"}</button>`;ready()}
+function ready(){
+ let c=0,t=0;const rows=T.map((n,k)=>{const s=stats[k]||{c:0,t:0};c+=s.c;t+=s.t;const p=s.t?Math.round(s.c/s.t*100):0;return `<div class="row"><span>${n}</span><div class="bar"><i style="width:${p}%"></i></div><span>${s.t?p+"%":"–"}</span></div>`}).join("");
+ const p=t?Math.round(c/t*100):0,l=!t?"Answer a few questions to see your readiness.":p>=80?"Looking exam-ready. Keep it fresh!":p>=60?"Almost there. Focus on your weakest topic.":"Keep practising, you’re building the foundation.";
+ $("ready").innerHTML=`<b>📊 Readiness tracker</b><div class="big">${t?p+"%":"–"}</div><p>${l}</p>${rows}<p class="sub">${t} answers recorded on this device.</p><button class="chip" onclick="stats={};save();ready()">Reset progress</button>`}
+let AI=null,lang="English";
+const RULES="Stay within the public AZ-900 skills outline and never invent Azure facts. Use plain words for a beginner. Give ONE real-life African analogy (e.g. M-Pesa, matatus, mama mboga shops, Jumia, local power or water utilities). Keep it under 120 words. End with a line starting 'Remember:' that gives a memory hook of at most 8 words.";
+async function ask(p,el){el.textContent="Thinking…";try{const r=await AI(p+"\n"+RULES+"\nReply in "+lang+".",{onText:x=>el.textContent=x.text,cache:false});el.textContent=r.text}catch(e){el.textContent="AI helper is unavailable right now. Use the written explanation above."}}
+function explain(){const q=list[i];ask("You are a friendly AZ-900 tutor. Question: "+q[1]+"\nOptions: "+q[2].join(" | ")+"\nCorrect answer: "+q[2][q[3]]+"\nExplain the concept behind the correct answer.",$("aiout"))}
+function buddy(){const t=$("bq").value.trim();if(t)ask("You are a friendly AZ-900 tutor. A learner asks: "+t+"\nIf it is not about Azure or cloud basics, politely say so.",$("bout"))}
+(async()=>{try{if(window.claude){AI=await claude.use("sample");if(AI)$("tools").style.display="block"}}catch(e){AI=null}})();
+chips();$("app").innerHTML=`<div class="card"><b>Ready to start?</b><p class="sub">${Q.length} original questions across ${T.length} AZ-900 topics.</p><button class="primary" onclick="start(-1)">Start with all topics</button></div>`;ready();
+</script>
+</body>
+</html>
