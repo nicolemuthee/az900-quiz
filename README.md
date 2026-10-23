@@ -13,7 +13,7 @@ An unofficial study tool for learners preparing for the Azure Fundamentals (AZ-9
 
 ## Live prototype
 
-LIVE_LINK_HERE
+[LIVE_LINK_HERE](https://nicolemuthee.github.io/az900-quiz/)
 
 ## Run locally
 
